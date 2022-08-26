@@ -78,7 +78,7 @@ impl PartialEq for Signer {
 
 /// A partially-constructed threshold signature, made by each participant in the
 /// signing protocol during the first phase of a signature creation.
-#[derive(Debug, BorshSerialize, BorshDeserialize)]
+#[derive(Debug, Clone, BorshSerialize, BorshDeserialize)]
 pub struct PartialThresholdSignature {
     pub(crate) index: u32,
     pub(crate) z: Scalar,
