@@ -59,7 +59,7 @@ impl From<NoncePair> for CommitmentShare {
 }
 
 /// A pair of a nonce and a commitment to it.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize)]
 pub(crate) struct Commitment {
     /// The nonce.
     pub(crate) nonce: Scalar,
@@ -88,7 +88,7 @@ impl ConstantTimeEq for Commitment {
 }
 
 /// A precomputed commitment share.
-#[derive(Clone, Debug, Zeroize)]
+#[derive(Clone, Debug, Zeroize, BorshSerialize, BorshDeserialize)]
 #[zeroize(drop)]
 pub struct CommitmentShare {
     /// The hiding commitment.
@@ -117,7 +117,7 @@ impl CommitmentShare {
 
 /// A secret commitment share list, containing the revealed nonces for the
 /// hiding and binding commitments.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize)]
 pub struct SecretCommitmentShareList {
     /// The secret commitment shares.
     pub commitments: Vec<CommitmentShare>,
