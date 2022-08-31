@@ -200,7 +200,7 @@ pub struct Coefficients(pub(crate) Vec<Scalar>);
 
 /// A commitment to the dealer's secret polynomial coefficients for Feldman's
 /// verifiable secret sharing scheme.
-#[derive(Clone, Debug)]
+#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub struct VerifiableSecretSharingCommitment(pub(crate) Vec<RistrettoPoint>);
 
 /// A participant created by a trusted dealer.
@@ -400,14 +400,14 @@ mod private {
 
 /// State machine structures for holding intermediate values during a
 /// distributed key generation protocol run, to prevent misuse.
-#[derive(Clone, Debug)]
+#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub struct DistributedKeyGeneration<S: DkgState> {
     state: Box<ActualState>,
     data: S,
 }
 
 /// Shared state which occurs across all rounds of a threshold signing protocol run.
-#[derive(Clone, Debug)]
+#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 struct ActualState {
     /// The parameters for this instantiation of a threshold signature.
     parameters: Parameters,
@@ -457,7 +457,7 @@ impl Round2 for RoundTwo {}
 /// commitments and a zero-knowledge proof of a secret key to every other
 /// participant in the protocol.  During round one, each participant checks the
 /// zero-knowledge proofs of secret keys of all other participants.
-#[derive(Clone, Debug)]
+#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub struct RoundOne {}
 
 impl DistributedKeyGeneration<RoundOne> {
@@ -648,7 +648,7 @@ impl SecretShare {
 
 /// During round two each participant verifies their secret shares they received
 /// from each other participant.
-#[derive(Clone, Debug)]
+#[derive(Clone,BorshSerialize, BorshDeserialize, Debug)]
 pub struct RoundTwo {}
 
 impl DistributedKeyGeneration<RoundTwo> {
