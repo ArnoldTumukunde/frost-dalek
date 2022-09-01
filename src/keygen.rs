@@ -591,7 +591,7 @@ impl DistributedKeyGeneration<RoundOne> {
 
 /// A secret share calculated by evaluating a polynomial with secret
 /// coefficients for some indeterminant.
-#[derive(Clone, Debug, Zeroize, BorshSerialize, BorshDeserialize)]
+#[derive(Clone, Debug, Zeroize, BorshSerialize, BorshDeserialize, PartialEq, Eq)]
 #[zeroize(drop)]
 pub struct SecretShare {
     /// The participant index that this secret share was calculated for.
