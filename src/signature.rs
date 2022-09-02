@@ -167,14 +167,14 @@ impl_indexed_hashmap!(Type = SignerRs, Item = RistrettoPoint);
 
 /// A type for storing signers' partial threshold signatures along with the
 /// respective signer participant index.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct PartialThresholdSignatures(pub(crate) HashMap<[u8; 4], Scalar>);
 
 impl_indexed_hashmap!(Type = PartialThresholdSignatures, Item = Scalar);
 
 /// A type for storing signers' individual public keys along with the respective
 /// signer participant index.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct IndividualPublicKeys(pub(crate) HashMap<[u8; 4], RistrettoPoint>);
 
 impl_indexed_hashmap!(Type = IndividualPublicKeys, Item = RistrettoPoint);
@@ -369,7 +369,7 @@ impl SecretKey {
 pub trait Aggregator {}
 
 /// The internal state of a signature aggregator.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct AggregatorState {
     /// The protocol instance parameters.
     pub(crate) parameters: Parameters,
@@ -389,7 +389,7 @@ pub(crate) struct AggregatorState {
 /// [`PartialThresholdSignature`] and creates the final [`ThresholdSignature`].
 /// The signature aggregator may even be one of the \\(t\\) participants in this
 /// signing operation.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SignatureAggregator<A: Aggregator> {
     /// The aggregator's actual state, shared across types.
     pub(crate) state: Box<AggregatorState>,
