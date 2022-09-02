@@ -399,7 +399,7 @@ pub struct SignatureAggregator<A: Aggregator> {
 
 /// The initial state for a [`SignatureAggregator`], which may include invalid
 /// or non-sensical data.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Initial<'sa> {
     /// An optional context string for computing the message hash.
     pub(crate) context: &'sa [u8],
