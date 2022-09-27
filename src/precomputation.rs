@@ -128,7 +128,7 @@ pub struct SecretCommitmentShareList {
 ///
 /// This should be published somewhere before the signing protocol takes place
 /// for the other signing participants to obtain.
-#[derive(Clone, Debug, BorshSerialize, BorshDeserialize)]
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize, PartialEq)]
 pub struct PublicCommitmentShareList {
     /// The participant's index.
     pub participant_index: u32,
