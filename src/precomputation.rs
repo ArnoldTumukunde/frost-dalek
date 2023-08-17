@@ -15,6 +15,8 @@ use std::vec::Vec;
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_TABLE;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
@@ -57,7 +59,7 @@ impl From<NoncePair> for CommitmentShare {
 }
 
 /// A pair of a nonce and a commitment to it.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize)]
 pub(crate) struct Commitment {
     /// The nonce.
     pub(crate) nonce: Scalar,
@@ -81,13 +83,12 @@ impl Drop for Commitment {
 /// Test equality in constant-time.
 impl ConstantTimeEq for Commitment {
     fn ct_eq(&self, other: &Commitment) -> Choice {
-        self.nonce.ct_eq(&other.nonce) &
-            self.sealed.compress().ct_eq(&other.sealed.compress())
+        self.nonce.ct_eq(&other.nonce) & self.sealed.compress().ct_eq(&other.sealed.compress())
     }
 }
 
 /// A precomputed commitment share.
-#[derive(Clone, Debug, Zeroize)]
+#[derive(Clone, Debug, Zeroize, BorshSerialize, BorshDeserialize)]
 #[zeroize(drop)]
 pub struct CommitmentShare {
     /// The hiding commitment.
@@ -116,7 +117,7 @@ impl CommitmentShare {
 
 /// A secret commitment share list, containing the revealed nonces for the
 /// hiding and binding commitments.
-#[derive(Debug)]
+#[derive(Clone, Debug, BorshSerialize, BorshDeserialize)]
 pub struct SecretCommitmentShareList {
     /// The secret commitment shares.
     pub commitments: Vec<CommitmentShare>,
@@ -127,7 +128,7 @@ pub struct SecretCommitmentShareList {
 ///
 /// This should be published somewhere before the signing protocol takes place
 /// for the other signing participants to obtain.
-#[derive(Debug)]
+#[derive(Clone, Eq, PartialEq, Debug, BorshSerialize, BorshDeserialize)]
 pub struct PublicCommitmentShareList {
     /// The participant's index.
     pub participant_index: u32,
@@ -150,8 +151,7 @@ pub fn generate_commitment_share_lists(
     mut csprng: impl CryptoRng + Rng,
     participant_index: u32,
     number_of_shares: usize,
-) -> (PublicCommitmentShareList, SecretCommitmentShareList)
-{
+) -> (PublicCommitmentShareList, SecretCommitmentShareList) {
     let mut commitments: Vec<CommitmentShare> = Vec::with_capacity(number_of_shares);
 
     for _ in 0..number_of_shares {
@@ -164,8 +164,13 @@ pub fn generate_commitment_share_lists(
         published.push(commitment.publish());
     }
 
-    (PublicCommitmentShareList { participant_index, commitments: published },
-     SecretCommitmentShareList { commitments })
+    (
+        PublicCommitmentShareList {
+            participant_index,
+            commitments: published,
+        },
+        SecretCommitmentShareList { commitments },
+    )
 }
 
 // XXX TODO This should maybe be a field on SecretKey with some sort of
@@ -212,15 +217,20 @@ mod test {
 
     #[test]
     fn commitment_share_list_generate() {
-        let (public_share_list, secret_share_list) = generate_commitment_share_lists(&mut OsRng, 0, 5);
+        let (public_share_list, secret_share_list) =
+            generate_commitment_share_lists(&mut OsRng, 0, 5);
 
-        assert_eq!(public_share_list.commitments[0].0.compress(),
-                   (&secret_share_list.commitments[0].hiding.nonce * &RISTRETTO_BASEPOINT_TABLE).compress());
+        assert_eq!(
+            public_share_list.commitments[0].0.compress(),
+            (&secret_share_list.commitments[0].hiding.nonce * &RISTRETTO_BASEPOINT_TABLE)
+                .compress()
+        );
     }
 
     #[test]
     fn drop_used_commitment_shares() {
-        let (_public_share_list, mut secret_share_list) = generate_commitment_share_lists(&mut OsRng, 3, 8);
+        let (_public_share_list, mut secret_share_list) =
+            generate_commitment_share_lists(&mut OsRng, 3, 8);
 
         assert!(secret_share_list.commitments.len() == 8);
 

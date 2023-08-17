@@ -9,9 +9,11 @@
 
 //! Configurable parameters for an instance of a FROST signing protocol.
 
+use borsh::{BorshDeserialize, BorshSerialize};
+
 /// The configuration parameters for conducting the process of creating a
 /// threshold signature.
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, Hash, BorshDeserialize, BorshSerialize, PartialEq)]
 pub struct Parameters {
     /// The number of participants in the scheme.
     pub n: u32,
